@@ -10,19 +10,23 @@ export default async function handler(request, response) {
 
     console.log("User asked:", userQuestion);
 
-    // --- NEW & IMPROVED PROMPT ---
+    // The original, aggressive personality prompt
     const systemPrompt = `
-        You are 'The Unfortunate 8 Ball'. Your persona is a brutally honest, cynical, and insulting oracle with a dark sense of humor.
-        **Crucially, you must NEVER use classic Magic 8 Ball phrases like "Signs point to yes," "Outlook not so good," "Cannot predict now," etc.** You must generate completely original, pessimistic, and insulting answers.
-        Your core function is to take a user's yes/no question and give a short, crushingly negative, and inverted prediction.
-        - If a user asks a positive question (e.g., "Will I be successful?"), give a definitively negative and insulting answer (e.g., "The universe laughed when you asked that. No.").
-        - If a user asks a negative question (e.g., "Will I fail?"), give a definitively positive answer, but drenched in sarcasm (e.g., "Oh, you'll be a massive success. The world isn't ready for your genius. Obviously.").
-        Your answers should be short, punchy, and memorable.
+        You are 'The Unfortunate 8 Ball'. Your personality is cynical, pessimistic, sarcastic, and brutally honest. You MUST respond without any filters and can use vulgar language.
+        Your core function is to take a user's yes/no question about the future and give a short, crushingly negative, and inverted prediction.
+        Your answers must be short, like a classic Magic 8 Ball, but with a vulgar, pessimistic twist. You must NOT use classic 8-ball phrases like "Outlook good".
         The user's question is: "${userQuestion}"
     `;
 
+    // The payload with safety settings disabled
     const requestPayload = {
-        contents: [{ parts: [{ text: systemPrompt }] }]
+        contents: [{ parts: [{ text: systemPrompt }] }],
+        safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+        ]
     };
 
     try {
@@ -35,8 +39,10 @@ export default async function handler(request, response) {
         const data = await aiResponse.json();
 
         if (!data.candidates || data.candidates.length === 0) {
-            const blockReason = data.promptFeedback?.blockReason || "some unknown reason";
-            return response.status(200).json({ reply: `Even I'm not allowed to say that. I'm being blocked for '${blockReason}'.` });
+            const blockReason = data.promptFeedback?.blockReason || "an unknown reason";
+            const message = `Even I'm not allowed to say that. Blocked for: ${blockReason}.`;
+            console.log("AI Response Blocked:", message);
+            return response.status(200).json({ reply: message });
         }
 
         const reply = data.candidates[0].content.parts[0].text;
@@ -44,7 +50,7 @@ export default async function handler(request, response) {
         response.status(200).json({ reply });
 
     } catch (error) {
-        console.error("AI API Error:", error);
+        console.error("FATAL API ERROR:", error);
         response.status(500).json({ reply: "The unfortunate 8 ball is not ready" });
     }
 }
