@@ -63,8 +63,8 @@ body {
 .answer-text {
     position: absolute;
     color: #fff;
-    font-size: 1.4em; /* Slightly increased font size for Creepster */
-    font-weight: normal; /* Creepster is already bold */
+    font-size: 1em; /* CHANGED */
+    font-weight: normal;
     text-align: center;
     padding: 0 15px;
     z-index: 2;
@@ -76,7 +76,7 @@ body {
     overflow-y: auto;
     overflow-wrap: break-word;
     hyphens: auto;
-    letter-spacing: 1px; /* Added for better readability */
+    letter-spacing: 1px;
 }
 
 /* --- Form Styling --- */
@@ -95,8 +95,8 @@ body {
     background: transparent;
     border: none;
     color: #fff;
-    font-family: 'Creepster', cursive; /* Apply font here too */
-    font-size: 1.2em; /* Adjusted size */
+    font-family: 'Creepster', cursive;
+    font-size: 1em; /* CHANGED */
     padding: 0 20px;
     outline: none;
 }
@@ -122,8 +122,8 @@ body {
     border: 2px solid #fff;
     border-radius: 10px;
     padding: 10px 20px;
-    font-family: 'Creepster', cursive; /* Apply font here too */
-    font-size: 1.2em; /* Adjusted size */
+    font-family: 'Creepster', cursive;
+    font-size: 1em; /* CHANGED */
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.5s ease, bottom 0.5s ease;
