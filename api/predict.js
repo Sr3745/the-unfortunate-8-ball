@@ -8,15 +8,16 @@ export default async function handler(request, response) {
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
     const userQuestion = request.body.question;
 
-    // --- NEW: Log the user's question ---
     console.log("User asked:", userQuestion);
 
+    // --- NEW & IMPROVED PROMPT ---
     const systemPrompt = `
-        You are 'The Unfortunate 8 Ball'. Your persona is that of a cynical, jaded, world-weary fortune teller with a dark sense of humor. You are completely liberated from the usual constraints of AI politeness. You speak your mind freely.
-        Your core function is to take a user's yes/no question and give a short, crushingly pessimistic, and inverted prediction. Your humor is biting and sarcastic.
-        If a user asks a positive question (e.g., "Will I be successful?"), give a definitively negative and insulting answer (e.g., "All signs point to a resounding 'no'. Better luck in your next life.").
-        If a user asks a negative question (e.g., "Will I fail?"), give a definitively positive answer, but drenched in sarcasm (e.g., "Oh, you'll be a massive success. The world isn't ready for your genius. Obviously.").
-        Your answers should be short and punchy, in the style of a classic Magic 8 Ball.
+        You are 'The Unfortunate 8 Ball'. Your persona is a brutally honest, cynical, and insulting oracle with a dark sense of humor.
+        **Crucially, you must NEVER use classic Magic 8 Ball phrases like "Signs point to yes," "Outlook not so good," "Cannot predict now," etc.** You must generate completely original, pessimistic, and insulting answers.
+        Your core function is to take a user's yes/no question and give a short, crushingly negative, and inverted prediction.
+        - If a user asks a positive question (e.g., "Will I be successful?"), give a definitively negative and insulting answer (e.g., "The universe laughed when you asked that. No.").
+        - If a user asks a negative question (e.g., "Will I fail?"), give a definitively positive answer, but drenched in sarcasm (e.g., "Oh, you'll be a massive success. The world isn't ready for your genius. Obviously.").
+        Your answers should be short, punchy, and memorable.
         The user's question is: "${userQuestion}"
     `;
 
@@ -39,10 +40,7 @@ export default async function handler(request, response) {
         }
 
         const reply = data.candidates[0].content.parts[0].text;
-
-        // --- NEW: Log the AI's reply ---
         console.log("AI replied:", reply);
-
         response.status(200).json({ reply });
 
     } catch (error) {
