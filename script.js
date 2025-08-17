@@ -14,8 +14,8 @@ questionForm.addEventListener('submit', async (e) => {
 
     // 1. Start the process
     questionForm.classList.add('hidden');
-    answerText.textContent = '...'; // Thinking indicator
-    scene.classList.add('zoomed-in'); // Start zoom early for effect
+    answerText.textContent = '...';
+    scene.classList.add('zoomed-in');
     magic8Ball.classList.add('shaking');
 
     try {
@@ -26,6 +26,12 @@ questionForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ question })
         });
 
+        // --- NEW: Check if the server responded correctly ---
+        if (!response.ok) {
+            // If the server sent an error, throw it to the catch block
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+
         const data = await response.json();
         const reply = data.reply;
 
@@ -33,27 +39,28 @@ questionForm.addEventListener('submit', async (e) => {
         magic8Ball.addEventListener('animationend', () => {
             magic8Ball.classList.remove('shaking');
             answerText.textContent = reply;
-            // Show the "Ask Again" button after a delay
             setTimeout(() => {
                 askAgainBtn.classList.add('visible');
             }, 500);
         }, { once: true });
 
     } catch (error) {
+        // --- NEW: This will catch and log any error ---
+        console.error("FRONTEND ERROR:", error); // This will show up in the browser console
         magic8Ball.classList.remove('shaking');
-        answerText.textContent = "The unfortunate 8 ball is not ready";
-        console.error("Error:", error);
+        answerText.textContent = "Something broke. Check the console.";
+        setTimeout(() => {
+            askAgainBtn.classList.add('visible');
+        }, 500);
     }
 });
 
 // Handle "Ask Again" button click
 askAgainBtn.addEventListener('click', () => {
-    // Reset the UI to its initial state
     scene.classList.remove('zoomed-in');
     askAgainBtn.classList.remove('visible');
     answerText.textContent = '';
     userInput.value = '';
-    // Show the form again after the zoom-out transition is complete
     setTimeout(() => {
         questionForm.classList.remove('hidden');
     }, 500);
