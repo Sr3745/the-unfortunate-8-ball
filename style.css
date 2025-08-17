@@ -1,0 +1,154 @@
+/* --- Basic Setup --- */
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.scene {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+/* --- Magic 8 Ball Styling --- */
+.magic-8-ball {
+    width: 300px;
+    height: 300px;
+    background-color: #000;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 20px #a0f, 0 0 40px #0af, inset 0 0 30px rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.5s ease-in-out;
+}
+
+.display-area {
+    width: 150px;
+    height: 150px;
+    background-color: #111;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.triangle {
+    width: 0;
+    height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-bottom: 105px solid #4a00e0;
+    position: absolute;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.answer-text {
+    position: absolute;
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 10px;
+    z-index: 2;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+}
+
+/* --- Form Styling --- */
+.question-form {
+    display: flex;
+    width: 350px;
+    padding: 8px;
+    border: 2px solid #4a00e0;
+    border-radius: 50px;
+    box-shadow: 0 0 15px #4a00e0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#user-input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.1em;
+    padding: 0 20px;
+    outline: none;
+}
+
+.question-form button {
+    width: 50px;
+    height: 50px;
+    background: #4a00e0;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 2em;
+    cursor: pointer;
+}
+
+/* --- Ask Again Button --- */
+.ask-again-btn {
+    position: absolute;
+    bottom: -100px; /* Start hidden off-screen */
+    left: 20px;
+    background: #4a00e0;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.5s ease, bottom 0.5s ease;
+}
+
+/* --- Animation and State Classes --- */
+.shaking {
+    animation: shake 0.8s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.zoomed-in .magic-8-ball {
+    transform: scale(2.5);
+}
+
+.zoomed-in .triangle {
+    opacity: 0;
+}
+
+.zoomed-in .answer-text {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.hidden {
+    opacity: 0 !important;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+.visible {
+    opacity: 1 !important;
+    bottom: 20px !important;
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Unfortunate 8 Ball</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="scene">
+        <div class="magic-8-ball" id="magic-8-ball">
+            <div class="display-area" id="display-area">
+                <div class="triangle" id="triangle"></div>
+                <p class="answer-text" id="answer-text"></p>
+            </div>
+        </div>
+
+        <form class="question-form" id="question-form">
+            <input type="text" id="user-input" placeholder="Ask your unfortunate question..." autocomplete="off" required>
+            <button type="submit" aria-label="Ask">➔</button>
+        </form>
+
+        <button class="ask-again-btn" id="ask-again-btn">Ask Again</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
