@@ -62,11 +62,17 @@ body {
     font-size: 1.2em;
     font-weight: bold;
     text-align: center;
-    padding: 0 10px;
+    padding: 0 15px; /* Increased padding slightly */
     z-index: 2;
     opacity: 0;
     transform: scale(0.8);
     transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+    /* --- FIX FOR LONG TEXT --- */
+    width: 80%; /* Constrain the width */
+    max-height: 80%; /* Constrain the height */
+    overflow-y: auto; /* Add scrollbar if it still overflows */
+    overflow-wrap: break-word; /* Break long words */
+    hyphens: auto; /* Add hyphens when breaking words */
 }
 
 /* --- Form Styling --- */
