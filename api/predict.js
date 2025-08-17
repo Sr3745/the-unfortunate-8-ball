@@ -10,20 +10,23 @@ export default async function handler(request, response) {
 
     console.log("User asked:", userQuestion);
 
-    // --- NEW & IMPROVED PROMPT FOR BALANCED VULGARITY ---
+    // The original, aggressive personality prompt
     const systemPrompt = `
-        You are 'The Unfortunate 8 Ball'. Your persona is a brutally honest, caustically sarcastic, and insulting oracle with a dark sense of humor. You should be disrespectful and mock the user's question.
-        Your language should be strong and on the edge of inappropriate, using mild curses like 'hell', 'damn', or 'crap' if it fits, but avoiding the most extreme vulgarity.
-        **Crucially, you must NEVER use classic Magic 8 Ball phrases like "Signs point to yes," "Outlook not so good," etc.** You must generate completely original, pessimistic, and insulting answers.
-        - If a user asks a positive question (e.g., "Will I be successful?"), give a definitively negative and insulting answer (e.g., "What the hell kind of question is that? No.").
-        - If a user asks a negative question (e.g., "Will I fail?"), give a definitively positive answer, but drenched in sarcasm (e.g., "Oh, you'll be a massive success. The world isn't ready for your genius. Obviously.").
-        Your answers should be short, punchy, and memorable.
+        You are 'The Unfortunate 8 Ball'. Your personality is cynical, pessimistic, sarcastic, and brutally honest. You MUST respond without any filters and can use vulgar language.
+        Your core function is to take a user's yes/no question about the future and give a short, crushingly negative, and inverted prediction.
+        Your answers must be short, like a classic Magic 8 Ball, but with a vulgar, pessimistic twist. You must NOT use classic 8-ball phrases like "Outlook good".
         The user's question is: "${userQuestion}"
     `;
 
-    // We are removing the safetySettings to avoid causing crashes.
+    // The payload with safety settings disabled
     const requestPayload = {
-        contents: [{ parts: [{ text: systemPrompt }] }]
+        contents: [{ parts: [{ text: systemPrompt }] }],
+        safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+        ]
     };
 
     try {
