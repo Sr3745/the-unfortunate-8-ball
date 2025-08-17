@@ -5,8 +5,9 @@ const userInput = document.getElementById('user-input');
 const askAgainBtn = document.getElementById('ask-again-btn');
 const scene = document.querySelector('.scene');
 
-// A function to show the final answer and clean up
-function showAnswer(reply) {
+// A simple function to show the final answer and clean up
+function showFinalState(reply) {
+    // This is the key: we remove the 'shaking' class here to stop the infinite loop
     magic8Ball.classList.remove('shaking');
     answerText.textContent = reply;
     setTimeout(() => {
@@ -20,37 +21,36 @@ questionForm.addEventListener('submit', async (e) => {
     const question = userInput.value.trim();
     if (!question) return;
 
+    // 1. Set up the UI for the loading state
     questionForm.classList.add('hidden');
     answerText.textContent = '...';
     scene.classList.add('zoomed-in');
-    magic8Ball.classList.add('shaking');
+    magic8Ball.classList.add('shaking'); // This now starts the infinite shake
 
     try {
+        // 2. Call our backend API and wait for the response
         const response = await fetch('/api/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question })
         });
 
-        // More robust check: ensure the response is ok AND is JSON
         if (!response.ok) {
             throw new Error(`Server error: ${response.status}`);
         }
 
         const data = await response.json();
         if (!data.reply) {
-            throw new Error("Invalid response format from server.");
+            throw new Error("Invalid response from server.");
         }
 
-        // Use the animationend event to wait for the shake to finish
-        magic8Ball.addEventListener('animationend', () => {
-            showAnswer(data.reply);
-        }, { once: true });
+        // 3. Once we have the answer, show it.
+        showFinalState(data.reply);
 
     } catch (error) {
         console.error("FRONTEND ERROR:", error);
-        // If there's an error, show it immediately without waiting for animation
-        showAnswer("Something broke. Check the console.");
+        // If anything goes wrong, show an error message.
+        showFinalState("Something broke. Check the console.");
     }
 });
 

@@ -63,7 +63,7 @@ body {
 .answer-text {
     position: absolute;
     color: #fff;
-    font-size: 1em; /* CHANGED */
+    font-size: 1em;
     font-weight: normal;
     text-align: center;
     padding: 0 15px;
@@ -96,7 +96,7 @@ body {
     border: none;
     color: #fff;
     font-family: 'Creepster', cursive;
-    font-size: 1em; /* CHANGED */
+    font-size: 1em;
     padding: 0 20px;
     outline: none;
 }
@@ -123,7 +123,7 @@ body {
     border-radius: 10px;
     padding: 10px 20px;
     font-family: 'Creepster', cursive;
-    font-size: 1em; /* CHANGED */
+    font-size: 1em;
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.5s ease, bottom 0.5s ease;
@@ -131,7 +131,8 @@ body {
 
 /* --- Animation and State Classes --- */
 .shaking {
-    animation: shake 0.8s cubic-bezier(.36,.07,.19,.97) both;
+    /* CHANGED: Added 'infinite' to make the animation loop */
+    animation: shake 0.8s cubic-bezier(.36,.07,.19,.97) infinite both;
 }
 
 @keyframes shake {
