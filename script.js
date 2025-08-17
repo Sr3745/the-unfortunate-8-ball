@@ -1,4 +1,3 @@
-// Get all the elements we need
 const magic8Ball = document.getElementById('magic-8-ball');
 const answerText = document.getElementById('answer-text');
 const questionForm = document.getElementById('question-form');
@@ -6,52 +5,52 @@ const userInput = document.getElementById('user-input');
 const askAgainBtn = document.getElementById('ask-again-btn');
 const scene = document.querySelector('.scene');
 
+// A function to show the final answer and clean up
+function showAnswer(reply) {
+    magic8Ball.classList.remove('shaking');
+    answerText.textContent = reply;
+    setTimeout(() => {
+        askAgainBtn.classList.add('visible');
+    }, 500);
+}
+
 // Handle form submission
 questionForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const question = userInput.value.trim();
     if (!question) return;
 
-    // 1. Start the process
     questionForm.classList.add('hidden');
     answerText.textContent = '...';
     scene.classList.add('zoomed-in');
     magic8Ball.classList.add('shaking');
 
     try {
-        // 2. Call our backend API
         const response = await fetch('/api/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question })
         });
 
-        // --- NEW: Check if the server responded correctly ---
+        // More robust check: ensure the response is ok AND is JSON
         if (!response.ok) {
-            // If the server sent an error, throw it to the catch block
-            throw new Error(`Server responded with status: ${response.status}`);
+            throw new Error(`Server error: ${response.status}`);
         }
 
         const data = await response.json();
-        const reply = data.reply;
+        if (!data.reply) {
+            throw new Error("Invalid response format from server.");
+        }
 
-        // 3. Stop shaking and show the answer
+        // Use the animationend event to wait for the shake to finish
         magic8Ball.addEventListener('animationend', () => {
-            magic8Ball.classList.remove('shaking');
-            answerText.textContent = reply;
-            setTimeout(() => {
-                askAgainBtn.classList.add('visible');
-            }, 500);
+            showAnswer(data.reply);
         }, { once: true });
 
     } catch (error) {
-        // --- NEW: This will catch and log any error ---
-        console.error("FRONTEND ERROR:", error); // This will show up in the browser console
-        magic8Ball.classList.remove('shaking');
-        answerText.textContent = "Something broke. Check the console.";
-        setTimeout(() => {
-            askAgainBtn.classList.add('visible');
-        }, 500);
+        console.error("FRONTEND ERROR:", error);
+        // If there's an error, show it immediately without waiting for animation
+        showAnswer("Something broke. Check the console.");
     }
 });
 
