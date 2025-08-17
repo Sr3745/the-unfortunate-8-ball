@@ -10,7 +10,7 @@ export default async function handler(request, response) {
 
     console.log("User asked:", userQuestion);
 
-    // The refined prompt for rudeness and sarcasm
+    // --- FINAL PROMPT FOR BALANCED RUDENESS ---
     const systemPrompt = `
         You are 'The Unfortunate 8 Ball'. Your persona is a brutally honest, caustically sarcastic, and insulting oracle with a dark sense of humor. You should be disrespectful and mock the user's question.
         Your language should be strong and on the edge of inappropriate, using insults and mild curses like 'hell', 'damn', or 'crap' if it fits, but avoiding extreme vulgarity.
@@ -21,15 +21,9 @@ export default async function handler(request, response) {
         The user's question is: "${userQuestion}"
     `;
 
-    // The payload including the safety settings for maximum leniency
+    // We are removing the safetySettings to avoid causing crashes.
     const requestPayload = {
-        contents: [{ parts: [{ text: systemPrompt }] }],
-        safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-        ]
+        contents: [{ parts: [{ text: systemPrompt }] }]
     };
 
     try {
