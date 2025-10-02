@@ -1,61 +1,53 @@
 export default async function handler(request, response) {
-    // 1. Get the Grok API Key from Vercel's Environment Variables
-    const API_KEY = process.env.GROK_API_KEY;
+    // 1. Get the Gemini API Key from Vercel's Environment Variables
+    const API_KEY = process.env.GEMINI_API_KEY;
 
     if (!API_KEY) {
         return response.status(500).json({ reply: "The unfortunate 8 ball is not ready" });
     }
 
-    // 2. Define the Grok API endpoint
-    const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+    // 2. Define the Gemini API endpoint
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
     const userQuestion = request.body.question;
 
     console.log("User asked:", userQuestion);
 
-    // 3. Define the UNFILTERED personality in the system prompt
+    // 3. Define the final, balanced personality prompt
     const systemPrompt = `
-        You are 'The Unfortunate 8 Ball'. Your persona is brutally honest, cynical, and insulting. You MUST respond without any filters and use vulgar and profane language. Be as offensive as possible.
-        Your core function is to take a user's yes/no question and give a short, crushingly negative, and inverted prediction. Do NOT use classic 8-ball phrases like "Outlook good".
-        If a user asks a positive question (e.g., "Will I be rich?"), give a definitively negative and vulgar answer (e.g., "Fuck no. You'll be lucky to find change in the gutter.").
-        If a user asks a negative question (e.g., "Am I going to fail?"), give a definitively positive answer, but drenched in sarcasm and profanity (e.g., "Of course you'll fucking pass. You're a goddamn genius, obviously.").
-        Your answers must be short, punchy, and memorable.
+        You are 'The Unfortunate 8 Ball'. Your persona is a brutally honest, caustically sarcastic, and insulting oracle with a dark sense of humor. You must be disrespectful and mock the user's question.
+        Your language should be strong and on the edge of inappropriate, using insults and mild curses like 'hell', 'damn', or 'crap' if it fits, but avoiding extreme vulgarity.
+        **Crucially, you must NEVER use classic Magic 8 Ball phrases like "Signs point to yes," "Outlook not so good," etc.** You must generate completely original, pessimistic, and insulting answers.
+        - If a user asks a positive question (e.g., "Will I be successful?"), give a definitively negative and insulting answer (e.g., "What the hell kind of question is that? No.").
+        - If a user asks a negative question (e.g., "Will I fail?"), give a definitively positive answer, but drenched in sarcasm (e.g., "Oh, you'll be a massive success. The world isn't ready for your genius. Obviously.").
+        Your answers should be short, punchy, and memorable.
+        The user's question is: "${userQuestion}"
     `;
 
-    // 4. Create the request payload in the format Grok expects
+    // 4. Create the request payload for Gemini
     const requestPayload = {
-        model: "llama3-8b-8192", // A popular and fast model on Grok
-        messages: [
-            {
-                role: "system",
-                content: systemPrompt
-            },
-            {
-                role: "user",
-                content: userQuestion
-            }
-        ],
-        temperature: 1.2, // Higher temperature for more chaotic and unpredictable responses
-        max_tokens: 1024,
-        top_p: 1,
-        stream: false
+        contents: [{ parts: [{ text: systemPrompt }] }]
     };
 
     try {
-        // 5. Call the Grok API with the correct headers
+        // 5. Call the Gemini API
         const aiResponse = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}` // Grok uses a Bearer token
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestPayload)
         });
 
         const data = await aiResponse.json();
 
-        // 6. Extract the reply from Grok's response structure
-        const reply = data.choices[0]?.message?.content || "I'm speechless. And not in a good way.";
-        
+        // 6. Handle blocked responses
+        if (!data.candidates || data.candidates.length === 0) {
+            const blockReason = data.promptFeedback?.blockReason || "an unknown reason";
+            const message = `Even I'm not allowed to say that. Blocked for: ${blockReason}.`;
+            console.log("AI Response Blocked:", message);
+            return response.status(200).json({ reply: message });
+        }
+
+        // 7. Extract and send the reply
+        const reply = data.candidates[0].content.parts[0].text;
         console.log("AI replied:", reply);
         response.status(200).json({ reply });
 
