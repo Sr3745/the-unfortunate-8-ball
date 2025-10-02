@@ -6,8 +6,9 @@ export default async function handler(request, response) {
         return response.status(500).json({ reply: "The unfortunate 8 ball is not ready" });
     }
 
-    // 2. Define the Gemini API endpoint
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    // 2. --- THIS LINE IS THE FIX ---
+    // We are changing the model name to the correct 'gemini-pro'
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
     const userQuestion = request.body.question;
 
     console.log("User asked:", userQuestion);
